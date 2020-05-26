@@ -80,7 +80,9 @@ class AuthorController extends Controller
      */
     public function update(Request $request, Author $author)
     {
-        //
+        $author->update($request->input('data.attributes'));
+
+        return new AuthorResource($author);    
     }
 
     /**
@@ -91,6 +93,8 @@ class AuthorController extends Controller
      */
     public function destroy(Author $author)
     {
-        //
+        $author->delete();
+
+        return response(null, 204);
     }
 }
