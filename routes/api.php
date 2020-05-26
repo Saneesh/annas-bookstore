@@ -20,5 +20,6 @@ Route::middleware('auth:api')->prefix('v1')->group(function(){
     });
 
     // Authors
-    Route::get('/authors/{author}', 'AuthorController@show');
+    Route::get('/authors', 'AuthorController@index');
+    Route::get('/authors/{author}', 'AuthorController@show');        
 });

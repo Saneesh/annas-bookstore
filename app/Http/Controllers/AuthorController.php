@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Author;
 use Illuminate\Http\Request;
+use App\Http\Resources\AuthorResource;
 
 class AuthorController extends Controller
 {
@@ -14,7 +15,9 @@ class AuthorController extends Controller
      */
     public function index()
     {
-        //
+        $authors = Author::all();
+        
+        return AuthorResource::collection($authors);
     }
 
     /**
@@ -46,17 +49,7 @@ class AuthorController extends Controller
      */
     public function show(Author $author)
     {
-        return response()->json([
-            'data' => [
-                'id' => $author->id,
-                'type' => 'authors',
-                'attributes' => [
-                    'name' => $author->name,
-                    'created_at' => $author->created_at,
-                    'updated_at' => $author->updated_at,
-                ]
-            ]
-        ]);
+        return new AuthorResource($author);
     }
 
     /**
