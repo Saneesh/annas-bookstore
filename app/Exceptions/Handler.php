@@ -3,7 +3,9 @@
 namespace App\Exceptions;
 
 use Throwable;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
@@ -55,6 +57,18 @@ class Handler extends ExceptionHandler
         return parent::render($request, $exception);
     }
 
+    protected function prepareJsonResponse($request, Throwable $e)
+    {
+        return response()->json([
+            'errors' => [
+                [
+                'title' => Str::title(Str::snake(class_basename($e), ' ')),
+                'details' => $e->getMessage(),
+                ]
+            ]
+        ], $this->isHttpException($e) ? $e->getStatusCode() : 500);
+    }
+
     protected function invalidJson($request, ValidationException  $exception)
     {
         $errors = ( new Collection($exception->validator->errors()) )
@@ -72,5 +86,21 @@ class Handler extends ExceptionHandler
         return response()->json([
             'errors' => $errors,
         ], $exception->status);
+    }
+    
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        if($request->expectsJson()) {
+            return response()->json([
+                'errors' => [
+                    [
+                        'title' => 'Unauthenticated',
+                        'details' => 'You are not authenticated',
+                    ]
+                ]
+            ], 403);
+        }
+
+        return redirect()->guest($exception->redirectTo() ?? route('login'));
     }
 }
