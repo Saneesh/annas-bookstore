@@ -465,8 +465,8 @@ class AuthorTest extends TestCase
                     'name' => 'Jane Doe',
                     // 'created_at' => now()->setMilliseconds(0)->toJSON(),
                     // 'updated_at' => now() ->setMilliseconds(0)->toJSON(),
-                    'created_at' => $creationTimestamp->setMilliseconds(0)->toJSON(),
-                    'updated_at' => now()->setMilliseconds(0)->toJSON(),
+                    // 'created_at' => $creationTimestamp->setMilliseconds(0)->toJSON(),
+                    // 'updated_at' => now()->setMilliseconds(0)->toJSON(),
                 ],
             ]
         ]);
