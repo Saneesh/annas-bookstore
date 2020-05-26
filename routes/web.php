@@ -53,13 +53,15 @@ Route::get('/callback', function (Request $request) {
     return view('authenticated', array_merge($tokens, $user));
 });
 
-function fetchUser($accessToken, $http){
-    $response = $http->get(env('BOOKSTORE_URL').'/api/user', [
-        'headers' =>[
-            'Accept' => 'application/json',
-            'Authorization' => 'Bearer '.$accessToken,
-        ]
-    ]);
+if(!function_exists("fetchUser")) {
+    function fetchUser($accessToken, $http){
+        $response = $http->get(env('BOOKSTORE_URL').'/api/user', [
+            'headers' =>[
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer '.$accessToken,
+            ]
+        ]);
 
-    return json_decode((string) $response->getBody(), true);
+        return json_decode((string) $response->getBody(), true);
+    }
 }
