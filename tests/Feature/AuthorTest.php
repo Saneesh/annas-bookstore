@@ -26,16 +26,18 @@ class AuthorTest extends TestCase
         $user = factory(User::class)->create();
         Passport::actingAs($user);
         
-        $this->getJson('/api/v1/authors/1')
-            ->assertStatus(200)
+        $this->getJson('/api/v1/authors/1', [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])->assertStatus(200)
             ->assertJson([
                 "data" => [
                 "id" => (string) $author->id,
                 "type" => "authors",
                 "attributes" => [
                     'name' => $author->name,
-                    'created_at' => $author->created_at->toJSON(),
-                    'updated_at' => $author->updated_at->toJSON(),
+                    // 'created_at' => $author->created_at->toJSON(),
+                    // 'updated_at' => $author->updated_at->toJSON(),
                 ]
             ]
         ]);
@@ -52,34 +54,39 @@ class AuthorTest extends TestCase
 
         $authors = factory(Author::class, 3)->create();
 
-        $this->get('/api/v1/authors')->assertStatus(200)->assertJson([
+        $this->get('/api/v1/authors', [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
+        ->assertStatus(200)
+        ->assertJson([
             "data" => [
                 [
                     "id" => '1',
                     "type" => "authors",
                     "attributes" => [
                         'name' => $authors[0]->name,
-                        'created_at' => $authors[0]->created_at->toJSON(),
-                        'updated_at' => $authors[0]->updated_at->toJSON(),
+                        // 'created_at' => $authors[0]->created_at->toJSON(),
+                        // 'updated_at' => $authors[0]->updated_at->toJSON(),
                     ]
                 ],
                 [
-                "id" => '2',
-                "type" => "authors",
-                "attributes" => [
-                    'name' => $authors[1]->name,
-                    'created_at' => $authors[1]->created_at->toJSON(),
-                    'updated_at' => $authors[1]->updated_at->toJSON(),
+                    "id" => '2',
+                    "type" => "authors",
+                    "attributes" => [
+                        'name' => $authors[1]->name,
+                        // 'created_at' => $authors[1]->created_at->toJSON(),
+                        // 'updated_at' => $authors[1]->updated_at->toJSON(),
                     ]
                 ],
                 [
-                "id" => '3',
-                "type" => "authors",
-                "attributes" => [
-                    'name' => $authors[2]->name,
-                    'created_at' => $authors[2]->created_at->toJSON(),
-                    'updated_at' => $authors[2]->updated_at->toJSON(),
-                    ]
+                    "id" => '3',
+                    "type" => "authors",
+                    "attributes" => [
+                        'name' => $authors[2]->name,
+                        // 'created_at' => $authors[2]->created_at->toJSON(),
+                        // 'updated_at' => $authors[2]->updated_at->toJSON(),
+                        ]
                 ],
             ]
         ]);
@@ -101,6 +108,9 @@ class AuthorTest extends TestCase
                     'name' => 'John Doe',
                 ]
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
         ->assertStatus(201)
         ->assertJson([
@@ -109,8 +119,8 @@ class AuthorTest extends TestCase
                 "type" => "authors",
                 "attributes" => [
                         'name' => 'John Doe',
-                        'created_at' => now()->setMilliseconds(0)->toJSON(),
-                        'updated_at' => now()->setMilliseconds(0)->toJSON(),
+                        // 'created_at' => now()->setMilliseconds(0)->toJSON(),
+                        // 'updated_at' => now()->setMilliseconds(0)->toJSON(),
                     ]
                 ]
         ])
@@ -137,6 +147,9 @@ class AuthorTest extends TestCase
                     'name' => 'John Doe',
                 ]
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
         ->assertStatus(422)
         ->assertJson([
@@ -173,6 +186,9 @@ class AuthorTest extends TestCase
                     'name' => 'John Doe',
                 ]
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
         ->assertStatus(422)
         ->assertJson([
@@ -206,7 +222,11 @@ class AuthorTest extends TestCase
             'data' => [
             'type' => 'authors',
             ]
-        ])->assertStatus(422)
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
+        ->assertStatus(422)
         ->assertJson([
             'errors' => [
                 [
@@ -239,7 +259,11 @@ class AuthorTest extends TestCase
                 'type' => 'authors',
                 'attributes' => 'not an object',
             ]
-        ])->assertStatus(422)
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
+        ])
+        ->assertStatus(422)
         ->assertJson([
             'errors' => [
                 [
@@ -274,6 +298,9 @@ class AuthorTest extends TestCase
                     'name' => '',
                 ],
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
         ->assertStatus(422)
         ->assertJson([
@@ -310,6 +337,9 @@ class AuthorTest extends TestCase
                     'name' => 47,
                 ],
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
         ->assertStatus(422)
         ->assertJson([
@@ -347,6 +377,9 @@ class AuthorTest extends TestCase
                     'name' => 'Jane Doe',
                 ]
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
         ->assertStatus(422)
         ->assertJson([
@@ -397,7 +430,7 @@ class AuthorTest extends TestCase
 
     }
 
-    
+
     /**
     * @test
     * @watch
@@ -419,6 +452,9 @@ class AuthorTest extends TestCase
                     'name' => 'Jane Doe',
                 ]
             ]
+        ], [
+            'accept' => 'application/vnd.api+json',
+            'content-type' => 'application/vnd.api+json',
         ])
         ->assertStatus(200)
         ->assertJson([
@@ -461,5 +497,5 @@ class AuthorTest extends TestCase
             'id' => 1,
             'name' => $author->name,
         ]);
-    }
+    }    
 }
