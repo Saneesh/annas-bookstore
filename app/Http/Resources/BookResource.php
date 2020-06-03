@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\AuthorsIdentifierResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class BookResource extends JsonResource {
@@ -21,6 +22,15 @@ class BookResource extends JsonResource {
         'publication_year' => $this->publication_year,
         'created_at' => $this->created_at,
         'updated_at' => $this->updated_at,
+      ],
+      'relationships' => [
+        'authors' => [
+          'links' => [
+            'self' => route('books.relationships.authors', [$this->id]),
+            'related' => route('books.authors', [$this->id]),
+          ],
+          'data' => AuthorsIdentifierResource::collection($this->authors),
+        ],
       ],
     ];
   }

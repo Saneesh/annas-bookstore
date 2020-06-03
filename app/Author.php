@@ -2,9 +2,13 @@
 
 namespace App;
 
+use App\Book;
 use Illuminate\Database\Eloquent\Model;
 
-class Author extends Model
-{
-    protected $fillable = ['name'];
+class Author extends Model {
+  protected $fillable = ['name'];
+
+  public function books() {
+    return $this->belongsToMany(Book::class);
+  }
 }

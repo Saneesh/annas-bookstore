@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Author;
 use Illuminate\Database\Eloquent\Model;
 
 class Book extends Model {
@@ -10,4 +11,8 @@ class Book extends Model {
     'description',
     'publication_year',
   ];
+
+  public function authors() {
+    return $this->belongsToMany(Author::class);
+  }
 }
