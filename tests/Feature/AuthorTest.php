@@ -2,500 +2,597 @@
 
 namespace Tests\Feature;
 
-use App\User;
 use App\Author;
-use Tests\TestCase;
-use Laravel\Passport\Passport;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Laravel\Passport\Passport;
+use Tests\TestCase;
 
-class AuthorTest extends TestCase
-{
-    use DatabaseMigrations;
+class AuthorTest extends TestCase {
+  use DatabaseMigrations;
 
-    /**
-     * @test
-     */
-    public function it_returns_an_author_as_a_resource_object()
-    {
-        $author = Author::create([
-            'name' => 'John Doe',
-        ]);
+  /**
+   * @test
+   */
+  public function it_returns_an_author_as_a_resource_object() {
+    $author = Author::create([
+      'name' => 'John Doe',
+    ]);
 
-        $user = factory(User::class)->create();
-        Passport::actingAs($user);
-        
-        $this->getJson('/api/v1/authors/1', [
-            'accept' => 'application/vnd.api+json',
-            'content-type' => 'application/vnd.api+json',
-        ])->assertStatus(200)
-            ->assertJson([
-                "data" => [
-                "id" => (string) $author->id,
-                "type" => "authors",
-                "attributes" => [
-                    'name' => $author->name,
-                    // 'created_at' => $author->created_at->toJSON(),
-                    // 'updated_at' => $author->updated_at->toJSON(),
-                ]
-            ]
-        ]);
-    }
+    $user = factory(User::class)->create();
+    Passport::actingAs($user);
 
-    /**
-    * @test
-    * @watch
-    */
-    public function it_returns_all_authors_as_a_collection_of_resource_objects()
-    {
-        $user = factory(User::class)->create();
-        Passport::actingAs($user);
+    $this->getJson('/api/v1/authors/1', [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])->assertStatus(200)
+      ->assertJson([
+        "data" => [
+          "id" => (string) $author->id,
+          "type" => "authors",
+          "attributes" => [
+            'name' => $author->name,
+            // 'created_at' => $author->created_at->toJSON(),
+            // 'updated_at' => $author->updated_at->toJSON(),
+          ],
+        ],
+      ]);
+  }
 
-        $authors = factory(Author::class, 3)->create();
+  /**
+   * @test
+   * @watch
+   */
+  public function it_returns_all_authors_as_a_collection_of_resource_objects() {
+    $user = factory(User::class)->create();
+    Passport::actingAs($user);
 
-        $this->get('/api/v1/authors', [
-            'accept' => 'application/vnd.api+json',
-            'content-type' => 'application/vnd.api+json',
-        ])
-        ->assertStatus(200)
-        ->assertJson([
-            "data" => [
-                [
-                    "id" => '1',
-                    "type" => "authors",
-                    "attributes" => [
-                        'name' => $authors[0]->name,
-                        // 'created_at' => $authors[0]->created_at->toJSON(),
-                        // 'updated_at' => $authors[0]->updated_at->toJSON(),
-                    ]
-                ],
-                [
-                    "id" => '2',
-                    "type" => "authors",
-                    "attributes" => [
-                        'name' => $authors[1]->name,
-                        // 'created_at' => $authors[1]->created_at->toJSON(),
-                        // 'updated_at' => $authors[1]->updated_at->toJSON(),
-                    ]
-                ],
-                [
-                    "id" => '3',
-                    "type" => "authors",
-                    "attributes" => [
-                        'name' => $authors[2]->name,
-                        // 'created_at' => $authors[2]->created_at->toJSON(),
-                        // 'updated_at' => $authors[2]->updated_at->toJSON(),
-                        ]
-                ],
-            ]
-        ]);
-    }
+    $authors = factory(Author::class, 3)->create();
 
-    /**
-    * @test
-    * @watch
-    */
-    public function it_can_create_an_author_from_a_resource_object()
-    {
-        $user = factory(User::class)->create();
-        Passport::actingAs($user);
+    $this->get('/api/v1/authors', [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(200)
+      ->assertJson([
+        "data" => [
+          [
+            "id" => '1',
+            "type" => "authors",
+            "attributes" => [
+              'name' => $authors[0]->name,
+              // 'created_at' => $authors[0]->created_at->toJSON(),
+              // 'updated_at' => $authors[0]->updated_at->toJSON(),
+            ],
+          ],
+          [
+            "id" => '2',
+            "type" => "authors",
+            "attributes" => [
+              'name' => $authors[1]->name,
+              // 'created_at' => $authors[1]->created_at->toJSON(),
+              // 'updated_at' => $authors[1]->updated_at->toJSON(),
+            ],
+          ],
+          [
+            "id" => '3',
+            "type" => "authors",
+            "attributes" => [
+              'name' => $authors[2]->name,
+              // 'created_at' => $authors[2]->created_at->toJSON(),
+              // 'updated_at' => $authors[2]->updated_at->toJSON(),
+            ],
+          ],
+        ],
+      ]);
+  }
 
-        $this->postJson('/api/v1/authors', [
-            'data' => [
-                'type' => 'authors',
-                'attributes' => [
-                    'name' => 'John Doe',
-                ]
-            ]
-        ], [
-            'accept' => 'application/vnd.api+json',
-            'content-type' => 'application/vnd.api+json',
-        ])
-        ->assertStatus(201)
-        ->assertJson([
-            "data" => [
-                "id" => '1',
-                "type" => "authors",
-                "attributes" => [
-                        'name' => 'John Doe',
-                        // 'created_at' => now()->setMilliseconds(0)->toJSON(),
-                        // 'updated_at' => now()->setMilliseconds(0)->toJSON(),
-                    ]
-                ]
-        ])
-        ->assertHeader('Location', url('/api/v1/authors/1'));
+  /**
+   * @test
+   * @watch
+   */
+  public function it_can_sort_authors_by_name_through_a_sort_query_parameter() {
+    // $this->withoutExceptionHandling();
+    $user = factory(User::class)->create();
 
-        $this->assertDatabaseHas('authors', [
-            'id' => 1,
-            'name' => 'John Doe'
-        ]);
-    }
+    Passport::actingAs($user);
 
-    /**
-    * @test
-    * @watch
-    */
-    public function it_validates_that_the_type_member_is_given_when_creating_an_author()
-    {
-        $user = factory(User::class)->create();
-        Passport::actingAs($user);
-        $this->postJson('/api/v1/authors', [
-            'data' => [
-                'type' => '',
-                'attributes' => [
-                    'name' => 'John Doe',
-                ]
-            ]
-        ], [
-            'accept' => 'application/vnd.api+json',
-            'content-type' => 'application/vnd.api+json',
-        ])
-        ->assertStatus(422)
-        ->assertJson([
-            'errors' => [
-                [
-                    'title' => 'Validation Error',
-                    'details' => 'The data.type field is required.',
-                    'source' => [
-                        'pointer' => '/data/type',
-                    ]
-                ]
-            ]
-        ]);
+    $authors = collect([
+      'Bertram',
+      'Claus',
+      'Anna',
+    ])->map(function ($name) {
+      return factory(Author::class)->create([
+        'name' => $name,
+      ]);
+    });
 
-        $this->assertDatabaseMissing('authors', [
-            'id' => 1,
-            'name' => 'John Doe'
-        ]);
-    }
+    // dd($authors);
 
-    /**
-    * @test
-    * @watch
-    */
-    public function it_validates_that_the_type_member_has_the_value_of_authors_when_creating_an_author()
-    {
-        $user = factory(User::class)->create();
-        Passport::actingAs($user);
-        
-        $this->postJson('/api/v1/authors', [
-            'data' => [
-                'type' => 'author',
-                'attributes' => [
-                    'name' => 'John Doe',
-                ]
-            ]
-        ], [
-            'accept' => 'application/vnd.api+json',
-            'content-type' => 'application/vnd.api+json',
-        ])
-        ->assertStatus(422)
-        ->assertJson([
-            'errors' => [
-                [
-                    'title' => 'Validation Error',
-                    'details' => 'The selected data.type is invalid.',
-                    'source' => [
-                        'pointer' => '/data/type',
-                    ]
-                ]
-            ]
-        ]);
-
-        $this->assertDatabaseMissing('authors', [
-            'id' => 1,
-            'name' => 'John Doe'
-        ]);
-    }
-
-    /**
-    * @test
-    * @watch
-    */
-    public function it_validates_that_the_attributes_member_has_been_given_when_creating_an_author()
-    {
-        $user = factory(User::class)->create();
-        Passport::actingAs($user);
-
-        $this->postJson('/api/v1/authors', [
-            'data' => [
+    $this->get('/api/v1/authors?sort=name', [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(200)
+      ->assertJson([
+        "data" => [
+          [
+            "id" => 3,
             'type' => 'authors',
-            ]
-        ], [
-            'accept' => 'application/vnd.api+json',
-            'content-type' => 'application/vnd.api+json',
-        ])
-        ->assertStatus(422)
-        ->assertJson([
-            'errors' => [
-                [
-                    'title' => 'Validation Error',
-                    'details' => 'The data.attributes field is required.',
-                    'source' => [
-                        'pointer' => '/data/attributes',
-                    ]
-                ]
-            ]
-        ]);
+            "attributes" => [
+              'name' => 'Anna',
+              // 'created_at' => $authors[2]->created_at->toJSON(),
+              // 'updated_at' => $authors[2]->updated_at->toJSON(),
+            ],
+          ],
+          [
+            "id" => 1,
+            'type' => 'authors',
+            "attributes" => [
+              'name' => 'Bertram',
+              // 'created_at' => $authors[0]->created_at->toJSON(),
+              // 'updated_at' => $authors[0]->updated_at->toJSON(),
+            ],
+          ],
+          [
+            "id" => 2,
+            'type' => 'authors',
+            "attributes" => [
+              'name' => 'Claus',
+              // 'created_at' => $authors[1]->created_at->toJSON(),
+              // 'updated_at' => $authors[1]->updated_at->toJSON(),
+            ],
+          ],
+        ],
+      ]);
+  }
 
-        $this->assertDatabaseMissing('authors', [
-            'id' => 1,
-            'name' => 'John Doe'
-        ]);
-    }
+  /**
+   * @test
+   * @watch
+   */
+  public function it_can_sort_authors_by_name_in_descending_order_through_a_sort_query_parameter() {
+    $user = factory(User::class)->create();
 
-    /**
-    * @test
-    * @watch
-    */
-    public function it_validates_that_the_attributes_member_is_an_object_given_when_creating_an_author()
-    {
-        $user = factory(User::class)->create();
-        Passport::actingAs($user);
+    Passport::actingAs($user);
 
-        $this->postJson('/api/v1/authors', [
-            'data' => [
-                'type' => 'authors',
-                'attributes' => 'not an object',
-            ]
-        ], [
-            'accept' => 'application/vnd.api+json',
-            'content-type' => 'application/vnd.api+json',
-        ])
-        ->assertStatus(422)
-        ->assertJson([
-            'errors' => [
-                [
-                    'title' => 'Validation Error',
-                    'details' => 'The data.attributes must be an array.',
-                    'source' => [
-                        'pointer' => '/data/attributes',
-                    ]
-                ]
-            ]
-        ]);
+    $authors = collect([
+      'Bertram',
+      'Claus',
+      'Anna',
+    ])->map(function ($name) {
+      return factory(Author::class)->create([
+        'name' => $name,
+      ]);
+    });
 
-        $this->assertDatabaseMissing('authors', [
-            'id' => 1,
-            'name' => 'John Doe'
-        ]);
-    }
+    // dd($authors);
 
-    /**
-    * @test
-    * @watch
-    */
-    public function it_validates_that_a_name_attribute_is_given_when_creating_an_author()
-    {
-        $user = factory(User::class)->create();
-        Passport::actingAs($user);
-        
-        $this->postJson('/api/v1/authors', [
-            'data' => [
-                'type' => 'authors',
-                'attributes' => [
-                    'name' => '',
-                ],
-            ]
-        ], [
-            'accept' => 'application/vnd.api+json',
-            'content-type' => 'application/vnd.api+json',
-        ])
-        ->assertStatus(422)
-        ->assertJson([
-            'errors' => [
-                [
-                    'title' => 'Validation Error',
-                    'details' => 'The data.attributes.name field is required.',
-                    'source' => [
-                        'pointer' => '/data/attributes/name',
-                    ]
-                ]
-            ]
-        ]);
+    $this->get('/api/v1/authors?sort=-name', [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(200)
+      ->assertJson([
+        "data" => [
+          [
+            "id" => 2,
+            'type' => 'authors',
+            "attributes" => [
+              'name' => 'Claus',
+              // 'created_at' => $authors[1]->created_at->toJSON(),
+              // 'updated_at' => $authors[1]->updated_at->toJSON(),
+            ],
+          ],
+          [
+            "id" => 1,
+            'type' => 'authors',
+            "attributes" => [
+              'name' => 'Bertram',
+              // 'created_at' => $authors[0]->created_at->toJSON(),
+              // 'updated_at' => $authors[0]->updated_at->toJSON(),
+            ],
+          ],
+          [
+            "id" => 3,
+            'type' => 'authors',
+            "attributes" => [
+              'name' => 'Anna',
+              // 'created_at' => $authors[2]->created_at->toJSON(),
+              // 'updated_at' => $authors[2]->updated_at->toJSON(),
+            ],
+          ],
+        ],
+      ]);
+  }
 
-        $this->assertDatabaseMissing('authors', [
-            'id' => 1,
-            'name' => 'John Doe'
-        ]);
-    }
+  /**
+   * @test
+   * @watch
+   */
+  public function it_can_create_an_author_from_a_resource_object() {
+    $user = factory(User::class)->create();
+    Passport::actingAs($user);
 
-    /**
-    * @test
-    * @watch
-    */
-    public function it_validates_that_a_name_attribute_is_a_string_when_creating_an_author()
-    {
-        $user = factory(User::class)->create();
-        Passport::actingAs($user);
+    $this->postJson('/api/v1/authors', [
+      'data' => [
+        'type' => 'authors',
+        'attributes' => [
+          'name' => 'John Doe',
+        ],
+      ],
+    ], [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(201)
+      ->assertJson([
+        "data" => [
+          "id" => '1',
+          "type" => "authors",
+          "attributes" => [
+            'name' => 'John Doe',
+            // 'created_at' => now()->setMilliseconds(0)->toJSON(),
+            // 'updated_at' => now()->setMilliseconds(0)->toJSON(),
+          ],
+        ],
+      ])
+      ->assertHeader('Location', url('/api/v1/authors/1'));
 
-        $this->postJson('/api/v1/authors', [
-            'data' => [
-                'type' => 'authors',
-                'attributes' => [
-                    'name' => 47,
-                ],
-            ]
-        ], [
-            'accept' => 'application/vnd.api+json',
-            'content-type' => 'application/vnd.api+json',
-        ])
-        ->assertStatus(422)
-        ->assertJson([
-            'errors' => [
-                [
-                    'title' => 'Validation Error',
-                    'details' => 'The data.attributes.name must be a string.',
-                    'source' => [
-                        'pointer' => '/data/attributes/name',
-                    ]
-                ]
-            ]
-        ]);
+    $this->assertDatabaseHas('authors', [
+      'id' => 1,
+      'name' => 'John Doe',
+    ]);
+  }
 
-        $this->assertDatabaseMissing('authors', [
-            'id' => 1,
-            'name' => 'John Doe'
-        ]);
-    }
+  /**
+   * @test
+   * @watch
+   */
+  public function it_validates_that_the_type_member_is_given_when_creating_an_author() {
+    $user = factory(User::class)->create();
+    Passport::actingAs($user);
+    $this->postJson('/api/v1/authors', [
+      'data' => [
+        'type' => '',
+        'attributes' => [
+          'name' => 'John Doe',
+        ],
+      ],
+    ], [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(422)
+      ->assertJson([
+        'errors' => [
+          [
+            'title' => 'Validation Error',
+            'details' => 'The data.type field is required.',
+            'source' => [
+              'pointer' => '/data/type',
+            ],
+          ],
+        ],
+      ]);
 
-    /**
-    * @test
-    * @watch
-    */
-    public function it_validates_that_an_id_member_is_given_when_updating_an_author()
-    {
-        $user = factory(User::class)->create();
-        Passport::actingAs($user);
-        $author = factory(Author::class)->create();
+    $this->assertDatabaseMissing('authors', [
+      'id' => 1,
+      'name' => 'John Doe',
+    ]);
+  }
 
-        $this->patchJson('/api/v1/authors/1', [
-            'data' => [
-                'type' => 'authors',
-                'attributes' => [
-                    'name' => 'Jane Doe',
-                ]
-            ]
-        ], [
-            'accept' => 'application/vnd.api+json',
-            'content-type' => 'application/vnd.api+json',
-        ])
-        ->assertStatus(422)
-        ->assertJson([
-            'errors' => [
-                [
-                    'title' => 'Validation Error',
-                    'details' => 'The data.id field is required.',
-                    'source' => [
-                        'pointer' => '/data/id',
-                    ]
-                ]
-            ]
-        ]);
+  /**
+   * @test
+   * @watch
+   */
+  public function it_validates_that_the_type_member_has_the_value_of_authors_when_creating_an_author() {
+    $user = factory(User::class)->create();
+    Passport::actingAs($user);
 
-        $this->assertDatabaseHas('authors', [
-            'id' => 1,
-            'name' => $author->name,
-        ]);
-    }
+    $this->postJson('/api/v1/authors', [
+      'data' => [
+        'type' => 'author',
+        'attributes' => [
+          'name' => 'John Doe',
+        ],
+      ],
+    ], [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(422)
+      ->assertJson([
+        'errors' => [
+          [
+            'title' => 'Validation Error',
+            'details' => 'The selected data.type is invalid.',
+            'source' => [
+              'pointer' => '/data/type',
+            ],
+          ],
+        ],
+      ]);
 
-    public function it_validates_that_an_id_member_is_a_string_when_updating_an_author()
-    {
+    $this->assertDatabaseMissing('authors', [
+      'id' => 1,
+      'name' => 'John Doe',
+    ]);
+  }
 
-    }
+  /**
+   * @test
+   * @watch
+   */
+  public function it_validates_that_the_attributes_member_has_been_given_when_creating_an_author() {
+    $user = factory(User::class)->create();
+    Passport::actingAs($user);
 
-    public function it_validates_that_the_type_member_is_given_when_updating_an_author()
-    {
+    $this->postJson('/api/v1/authors', [
+      'data' => [
+        'type' => 'authors',
+      ],
+    ], [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(422)
+      ->assertJson([
+        'errors' => [
+          [
+            'title' => 'Validation Error',
+            'details' => 'The data.attributes field is required.',
+            'source' => [
+              'pointer' => '/data/attributes',
+            ],
+          ],
+        ],
+      ]);
 
-    }
+    $this->assertDatabaseMissing('authors', [
+      'id' => 1,
+      'name' => 'John Doe',
+    ]);
+  }
 
-    public function it_validates_that_the_type_member_has_the_value_of_authors_when_updating_an_author()
-    {
+  /**
+   * @test
+   * @watch
+   */
+  public function it_validates_that_the_attributes_member_is_an_object_given_when_creating_an_author() {
+    $user = factory(User::class)->create();
+    Passport::actingAs($user);
 
-    }
-    
-    public function it_validates_that_the_attributes_member_has_been_given_when_updating_an_author()
-    {
+    $this->postJson('/api/v1/authors', [
+      'data' => [
+        'type' => 'authors',
+        'attributes' => 'not an object',
+      ],
+    ], [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(422)
+      ->assertJson([
+        'errors' => [
+          [
+            'title' => 'Validation Error',
+            'details' => 'The data.attributes must be an array.',
+            'source' => [
+              'pointer' => '/data/attributes',
+            ],
+          ],
+        ],
+      ]);
 
-    }
+    $this->assertDatabaseMissing('authors', [
+      'id' => 1,
+      'name' => 'John Doe',
+    ]);
+  }
 
-    public function it_validates_that_the_attributes_member_is_an_object_given_when_updating_an_author()
-    {
+  /**
+   * @test
+   * @watch
+   */
+  public function it_validates_that_a_name_attribute_is_given_when_creating_an_author() {
+    $user = factory(User::class)->create();
+    Passport::actingAs($user);
 
-    }
+    $this->postJson('/api/v1/authors', [
+      'data' => [
+        'type' => 'authors',
+        'attributes' => [
+          'name' => '',
+        ],
+      ],
+    ], [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(422)
+      ->assertJson([
+        'errors' => [
+          [
+            'title' => 'Validation Error',
+            'details' => 'The data.attributes.name field is required.',
+            'source' => [
+              'pointer' => '/data/attributes/name',
+            ],
+          ],
+        ],
+      ]);
 
-    public function it_validates_that_a_name_attribute_is_a_string_when_updating_an_author()
-    {
+    $this->assertDatabaseMissing('authors', [
+      'id' => 1,
+      'name' => 'John Doe',
+    ]);
+  }
 
-    }
+  /**
+   * @test
+   * @watch
+   */
+  public function it_validates_that_a_name_attribute_is_a_string_when_creating_an_author() {
+    $user = factory(User::class)->create();
+    Passport::actingAs($user);
 
+    $this->postJson('/api/v1/authors', [
+      'data' => [
+        'type' => 'authors',
+        'attributes' => [
+          'name' => 47,
+        ],
+      ],
+    ], [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(422)
+      ->assertJson([
+        'errors' => [
+          [
+            'title' => 'Validation Error',
+            'details' => 'The data.attributes.name must be a string.',
+            'source' => [
+              'pointer' => '/data/attributes/name',
+            ],
+          ],
+        ],
+      ]);
 
-    /**
-    * @test
-    * @watch
-    */
-    public function it_can_update_an_author_from_a_resource_object()
-    {
-        $user = factory(User::class)->create();
-        Passport::actingAs($user);
-        $author = factory(Author::class)->create();
+    $this->assertDatabaseMissing('authors', [
+      'id' => 1,
+      'name' => 'John Doe',
+    ]);
+  }
 
-        $creationTimestamp = now();
-        sleep(1);
+  /**
+   * @test
+   * @watch
+   */
+  public function it_validates_that_an_id_member_is_given_when_updating_an_author() {
+    $user = factory(User::class)->create();
+    Passport::actingAs($user);
+    $author = factory(Author::class)->create();
 
-        $this->patchJson('/api/v1/authors/1', [
-            'data' => [
-                'id' => '1',
-                'type' => 'authors',
-                'attributes' => [
-                    'name' => 'Jane Doe',
-                ]
-            ]
-        ], [
-            'accept' => 'application/vnd.api+json',
-            'content-type' => 'application/vnd.api+json',
-        ])
-        ->assertStatus(200)
-        ->assertJson([
-            'data' => [
-                'id' => '1',
-                'type' => 'authors',
-                'attributes' => [
-                    'name' => 'Jane Doe',
-                    // 'created_at' => now()->setMilliseconds(0)->toJSON(),
-                    // 'updated_at' => now() ->setMilliseconds(0)->toJSON(),
-                    // 'created_at' => $creationTimestamp->setMilliseconds(0)->toJSON(),
-                    // 'updated_at' => now()->setMilliseconds(0)->toJSON(),
-                ],
-            ]
-        ]);
-        
-        $this->assertDatabaseHas('authors', [
-                'id' => 1,
-                'name' => 'Jane Doe',
-        ]);
-    }
+    $this->patchJson('/api/v1/authors/1', [
+      'data' => [
+        'type' => 'authors',
+        'attributes' => [
+          'name' => 'Jane Doe',
+        ],
+      ],
+    ], [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(422)
+      ->assertJson([
+        'errors' => [
+          [
+            'title' => 'Validation Error',
+            'details' => 'The data.id field is required.',
+            'source' => [
+              'pointer' => '/data/id',
+            ],
+          ],
+        ],
+      ]);
 
-    /**
-    * @test
-    * @watch
-    */
-    public function it_can_delete_an_author_through_a_delete_request()
-    {
-        $user = factory(User::class)->create();
-        Passport::actingAs($user);
-        $author = factory(Author::class)->create();
+    $this->assertDatabaseHas('authors', [
+      'id' => 1,
+      'name' => $author->name,
+    ]);
+  }
 
-        $this->delete('/api/v1/authors/1', [], [
-            'Accept' => 'application/vnd.api+json',
-            'Content-Type' => 'application/vnd.api+json',
-        ])
-        ->assertStatus(204);
+  public function it_validates_that_an_id_member_is_a_string_when_updating_an_author() {
 
-        $this->assertDatabaseMissing('authors', [
-            'id' => 1,
-            'name' => $author->name,
-        ]);
-    }    
+  }
+
+  public function it_validates_that_the_type_member_is_given_when_updating_an_author() {
+
+  }
+
+  public function it_validates_that_the_type_member_has_the_value_of_authors_when_updating_an_author() {
+
+  }
+
+  public function it_validates_that_the_attributes_member_has_been_given_when_updating_an_author() {
+
+  }
+
+  public function it_validates_that_the_attributes_member_is_an_object_given_when_updating_an_author() {
+
+  }
+
+  public function it_validates_that_a_name_attribute_is_a_string_when_updating_an_author() {
+
+  }
+
+  /**
+   * @test
+   * @watch
+   */
+  public function it_can_update_an_author_from_a_resource_object() {
+    $user = factory(User::class)->create();
+    Passport::actingAs($user);
+    $author = factory(Author::class)->create();
+
+    $creationTimestamp = now();
+    sleep(1);
+
+    $this->patchJson('/api/v1/authors/1', [
+      'data' => [
+        'id' => '1',
+        'type' => 'authors',
+        'attributes' => [
+          'name' => 'Jane Doe',
+        ],
+      ],
+    ], [
+      'accept' => 'application/vnd.api+json',
+      'content-type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(200)
+      ->assertJson([
+        'data' => [
+          'id' => '1',
+          'type' => 'authors',
+          'attributes' => [
+            'name' => 'Jane Doe',
+            // 'created_at' => now()->setMilliseconds(0)->toJSON(),
+            // 'updated_at' => now() ->setMilliseconds(0)->toJSON(),
+            // 'created_at' => $creationTimestamp->setMilliseconds(0)->toJSON(),
+            // 'updated_at' => now()->setMilliseconds(0)->toJSON(),
+          ],
+        ],
+      ]);
+
+    $this->assertDatabaseHas('authors', [
+      'id' => 1,
+      'name' => 'Jane Doe',
+    ]);
+  }
+
+  /**
+   * @test
+   * @watch
+   */
+  public function it_can_delete_an_author_through_a_delete_request() {
+    $user = factory(User::class)->create();
+    Passport::actingAs($user);
+    $author = factory(Author::class)->create();
+
+    $this->delete('/api/v1/authors/1', [], [
+      'Accept' => 'application/vnd.api+json',
+      'Content-Type' => 'application/vnd.api+json',
+    ])
+      ->assertStatus(204);
+
+    $this->assertDatabaseMissing('authors', [
+      'id' => 1,
+      'name' => $author->name,
+    ]);
+  }
 }
