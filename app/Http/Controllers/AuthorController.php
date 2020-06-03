@@ -20,7 +20,7 @@ class AuthorController extends Controller {
     $authors = QueryBuilder::for(Author::class)
         ->allowedSorts([
             'name'
-        ])->get();
+        ])->jsonPaginate();
 
     //return new AuthorCollection($authors);
     return AuthorResource::collection($authors);
