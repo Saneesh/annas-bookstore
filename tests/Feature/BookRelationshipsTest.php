@@ -37,8 +37,12 @@ class BookRelationshipsTest extends TestCase {
           'relationships' => [
             'authors' => [
               'links' => [
-                'self' => route('books.relationships.authors', [$book->id]),
-                'related' => route('books.authors', [$book->id]),
+                'self' => route('books.relationships.authors', [
+                  'book' => $book->id,
+                ]),
+                'related' => route('books.authors', [
+                  'book' => $book->id,
+                ]),
               ],
               'data' => [
                 [
